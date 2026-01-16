@@ -16,18 +16,19 @@ app.use(express.static("public"));
 //---------------------------------------------------------------
 
 //mongoose setup
+const mongoUri =
+  process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/todolistDb";
+
 mongoose
-  .connect(
-    "mongodb+srv://Mahi:test123@cluster0.8i9qq4g.mongodb.net/todolistDb",
-    {
-      useNewUrlParser: true,
-    }
-  )
+  .connect(mongoUri)
   .then(() => {
     console.log("connected to db");
   })
   .catch((err) => {
-    console.log(err.message);
+    console.log("MongoDB connection error:", err.message);
+    console.log(
+      "Set MONGODB_URI in a .env file (see .env.example) or start a local MongoDB at mongodb://127.0.0.1:27017/todolistDb"
+    );
   });
 
 //schema
@@ -51,7 +52,7 @@ app.get("/", function (req, res) {
   Item.find({}, function (err, foundItems) {
     if (foundItems.length === 0) {
       Item.insertMany(arr1, function (err) {
-        if (err) retrun(err);
+        if (err) return err;
         else return console.log("success");
       });
       res.redirect("/");
